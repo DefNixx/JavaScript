@@ -15,8 +15,16 @@
             <input type="text" id="playerName" placeholder="Digite seu nome">
             <button onclick="startGame()">Iniciar Jogo</button>
         </div>
+
+        <div id="scoreboard">
+            <p>Jogador: <span id="playerScoreDisplay">0</span></p>
+            <p>Computador: <span id="computerScoreDisplay" class="computer">0</span></p>
+        </div>
+        
         <button onclick="restartGame()">Reiniciar Jogo</button>
     </header>
+
+
 
     <canvas id="board"></canvas>
 

@@ -71,7 +71,20 @@ function update() {
     {
         snakeBody.push([foodX, foodY]);
         placeFood();
+        playerScore++;
+        document.getElementById("food").classList.add("food-eaten");
+        setTimeout(() => {
+            document.getElementById("food").classList.remove("food-eaten");
+        }, 300);
+    }
+
+    if (snakeX == foodX && snakeY == foodY) 
+    {
+        snakeBody.push([foodX, foodY]);
+        placeFood();
         playerScore++; // Incrementa a pontuação do jogador
+        updateScoreboard(); 
+
     }
 
     if (computerSnakeX == foodX && computerSnakeY == foodY) 
@@ -79,6 +92,7 @@ function update() {
         computerSnakeBody.push([foodX, foodY]);
         placeFood();
         computerScore++; // Incrementa a pontuação do computador
+        updateScoreboard(); 
     }
 
     context.fillStyle = "black";
@@ -222,6 +236,12 @@ function checkCollisions() {
         endGame("Colisão direta entre as cobras!");
     }
 }
+function updateScoreboard() 
+{
+    document.getElementById("playerScoreDisplay").textContent = playerScore;
+
+    document.getElementById("computerScoreDisplay").textContent = computerScore;
+}
 
 function endGame(message) 
 {
@@ -282,7 +302,7 @@ function restartGame()
 
     playerScore = 0;
     computerScore = 0;
-
+    
     gameOver = false;
     placeFood();
 }

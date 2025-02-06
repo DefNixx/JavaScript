@@ -57,3 +57,27 @@ button:active {
     background-color: #ff5e00;
     transform: scale(0.95);
 }
+
+#scoreboard {
+    background-color: #333;
+    color: white;
+    padding: 10px;
+    border-radius: 10px;
+    display: inline-block;
+    margin-top: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+#scoreboard p {
+    margin: 5px 0;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+#scoreboard span {
+    color: #4CAF50; /* Verde para a pontuação do jogador */
+}
+
+#scoreboard span.computer {
+    color: #2196F3; /* Azul para a pontuação do computador */
+}
