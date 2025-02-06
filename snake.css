@@ -5,36 +5,55 @@ body
 }
 
 
+header 
+{
+    justify-content: center;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+header div 
+{
+    margin-bottom: 10px;
+}
+
+label 
+{
+    font-size: 16px;
+    font-weight: bold;
+}
+
+input[type="text"] 
+{
+    padding: 5px;
+    font-size: 16px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+}
+
 button {
-    background-color: red; 
+    background-color: red;
     border: none;
     color: white;
-    padding: 15px 30px; 
+    padding: 10px 20px;
     text-align: center;
     text-decoration: none;
     display: inline-block;
     font-size: 16px;
     font-family: 'Courier New', Courier, monospace;
     font-weight: bold;
-    border-radius: 8px; 
+    border-radius: 8px;
     cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.2s ease; 
-    margin: 10px 10px;/
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    margin: 10px;
 }
-
 
 button:hover {
-    background-color: #f79800; 
-    transform: scale(1.05); 
+    background-color: #f79800;
+    transform: scale(1.05);
 }
-
 
 button:active {
-    background-color: #ff5e00; 
-    transform: scale(0.95); 
-}
-
-button:disabled {
-    background-color: #cccccc;
-    cursor: not-allowed;
+    background-color: #ff5e00;
+    transform: scale(0.95);
 }

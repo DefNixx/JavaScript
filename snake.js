@@ -1,3 +1,8 @@
+// Variáveis para o nome do jogador e pontuação
+var playerName = "";
+var playerScore = 0;
+var computerScore = 0;
+
 //board
 var blockSize = 25;
 var rows = 20;
@@ -30,6 +35,16 @@ var foodY;
 //game over
 var gameOver = false; 
 
+function startGame() 
+{
+    playerName = document.getElementById("playerName").value;
+    if (!playerName) {
+        alert("Por favor, insira seu nome!");
+        return;
+    }
+    restartGame();
+}
+
 window.onload = function()
 {
     board = document.getElementById("board");
@@ -50,6 +65,20 @@ function update() {
     if (gameOver) 
     {
         return;
+    }
+
+    if (snakeX == foodX && snakeY == foodY) 
+    {
+        snakeBody.push([foodX, foodY]);
+        placeFood();
+        playerScore++; // Incrementa a pontuação do jogador
+    }
+
+    if (computerSnakeX == foodX && computerSnakeY == foodY) 
+    {
+        computerSnakeBody.push([foodX, foodY]);
+        placeFood();
+        computerScore++; // Incrementa a pontuação do computador
     }
 
     context.fillStyle = "black";
@@ -146,54 +175,66 @@ function checkCollisions() {
     // Colisões da cobra do jogador
     if (snakeX < 0 || snakeX > cols * blockSize - 1 || snakeY < 0 || snakeY > rows * blockSize - 1) 
     {
-        gameOver = true;
-        alert("Fim de Jogo! Você perdeu.");
+        endGame("Você perdeu!");
     }
 
     for (let i = 0; i < snakeBody.length; i++) 
     {
-        if (snakeX == snakeBody[i][0] && snakeY == snakeBody[i][1]) {
-            gameOver = true;
-            alert("Fim de Jogo! Você perdeu.");
+        if (snakeX == snakeBody[i][0] && snakeY == snakeBody[i][1])
+        {
+            endGame("Você perdeu!");
         }
     }
 
     // Colisões da cobra do computador
     if (computerSnakeX < 0 || computerSnakeX > cols * blockSize - 1 || computerSnakeY < 0 || computerSnakeY > rows * blockSize - 1) 
     {
-        gameOver = true;
-        alert("Fim de Jogo! O computador perdeu.");
+        endGame("O computador perdeu!");
     }
 
     for (let i = 0; i < computerSnakeBody.length; i++) 
     {
-        if (computerSnakeX == computerSnakeBody[i][0] && computerSnakeY == computerSnakeBody[i][1]) {
-            gameOver = true;
-            alert("Fim de Jogo! O computador perdeu.");
+        if (computerSnakeX == computerSnakeBody[i][0] && computerSnakeY == computerSnakeBody[i][1]) 
+        {
+            endGame("O computador perdeu!");
         }
     }
 
     // Colisão entre as cobras
     for (let i = 0; i < snakeBody.length; i++) 
     {
-        if (computerSnakeX == snakeBody[i][0] && computerSnakeY == snakeBody[i][1]) {
-            gameOver = true;
-            alert("Fim de Jogo! O computador colidiu com você.");
+        if (computerSnakeX == snakeBody[i][0] && computerSnakeY == snakeBody[i][1]) 
+        {
+            endGame("O computador colidiu com você!");
         }
     }
 
     for (let i = 0; i < computerSnakeBody.length; i++) 
     {
-        if (snakeX == computerSnakeBody[i][0] && snakeY == computerSnakeBody[i][1]) {
-            gameOver = true;
-            alert("Fim de Jogo! Você colidiu com o computador.");
+        if (snakeX == computerSnakeBody[i][0] && snakeY == computerSnakeBody[i][1]) 
+        {
+            endGame("Você colidiu com o computador!");
         }
     }
 
     if (snakeX == computerSnakeX && snakeY == computerSnakeY) 
     {
-        gameOver = true;
-        alert("Fim de Jogo! Colisão direta entre as cobras.");
+        endGame("Colisão direta entre as cobras!");
+    }
+}
+
+function endGame(message) 
+{
+    gameOver = true;
+    let resultMessage = `Fim de Jogo!\n${message}\n\n`;
+    resultMessage += `Jogador: ${playerName}\n`;
+    resultMessage += `Pontuação do Jogador: ${playerScore}\n`;
+    resultMessage += `Pontuação do Computador: ${computerScore}\n\n`;
+    resultMessage += `Deseja jogar novamente?`;
+
+    if (confirm(resultMessage)) 
+    {
+        restartGame();
     }
 }
 
@@ -238,6 +279,9 @@ function restartGame()
     computerVelocityX = 0;
     computerVelocityY = 0;
     computerSnakeBody = [];
+
+    playerScore = 0;
+    computerScore = 0;
 
     gameOver = false;
     placeFood();
