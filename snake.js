@@ -1,6 +1,5 @@
-window.addEventListener("keydown", function(e) 
-{
-    if (["ArrowUp", "ArrowDown"].includes(e.code)) {
+window.addEventListener("keydown", function (e) {
+    if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.code)) {
         e.preventDefault();
     }
 });
@@ -9,291 +8,243 @@ window.addEventListener("keydown", function(e)
 var playerName = "";
 var playerScore = 0;
 var computerScore = 0;
+var gameMode = "single"; // Padrão: jogar sozinho
 
-//board
+// Board
 var blockSize = 25;
 var rows = 20;
 var cols = 20;
 var board;
 var context;
 
-//cabeça da cobra player
+// Cabeça da cobra do jogador
 var snakeX = blockSize * 5;
 var snakeY = blockSize * 5;
-
 var velocityX = 0;
 var velocityY = 0;
-
 var snakeBody = [];
 
-//cabeça da cobra computador
+// Cabeça da cobra do computador
 var computerSnakeX = blockSize * 10;
 var computerSnakeY = blockSize * 10;
-
 var computerVelocityX = 0;
 var computerVelocityY = 0;
-
 var computerSnakeBody = [];
 
-//comida
+// Comida
 var foodX;
 var foodY;
 
-//game over
-var gameOver = false; 
+// Game over
+var gameOver = false;
 
-function startGame() 
-{
+function startGame() {
     playerName = document.getElementById("playerName").value;
     if (!playerName) {
         alert("Por favor, insira seu nome!");
         return;
     }
+
+    // Captura o modo de jogo escolhido
+    gameMode = document.getElementById("gameMode").value;
+
     restartGame();
 }
 
-window.onload = function()
-{
+window.onload = function () {
     board = document.getElementById("board");
     board.height = rows * blockSize;
-    board.width = cols * blockSize;  
-    context = board.getContext("2d"); //usado pra desenhar na board
-
+    board.width = cols * blockSize;
+    context = board.getContext("2d"); // Usado para desenhar na board
 
     placeFood();
     document.addEventListener("keyup", changeDirection);
 
-    setInterval(update, 1000/10); //a cada 100 ms a função de update vai ser executada
-    
-}
+    setInterval(update, 1000 / 10); // A cada 100 ms a função de update vai ser executada
+};
 
-//função update definindo os parâmetros/índices da comida e da cobra
+// Função update definindo os parâmetros/índices da comida e da cobra
 function update() {
-    if (gameOver) 
-    {
+    if (gameOver) {
         return;
     }
 
-    if (snakeX == foodX && snakeY == foodY) 
-    {
-        snakeBody.push([foodX, foodY]);
-        placeFood();
-        playerScore++;
-        document.getElementById("food").classList.add("food-eaten");
-        setTimeout(() => {
-            document.getElementById("food").classList.remove("food-eaten");
-        }, 300);
-    }
-
-    if (snakeX == foodX && snakeY == foodY) 
-    {
-        snakeBody.push([foodX, foodY]);
-        placeFood();
-        playerScore++; // Incrementa a pontuação do jogador
-        updateScoreboard(); 
-
-    }
-
-    if (computerSnakeX == foodX && computerSnakeY == foodY) 
-    {
-        computerSnakeBody.push([foodX, foodY]);
-        placeFood();
-        computerScore++; // Incrementa a pontuação do computador
-        updateScoreboard(); 
-    }
-
+    // Limpa o canvas
     context.fillStyle = "black";
     context.fillRect(0, 0, board.width, board.height);
 
+    // Desenha a comida
     context.fillStyle = "red";
     context.fillRect(foodX, foodY, blockSize, blockSize);
 
-    // Movimentação da cobra do jogador
-    if (snakeX == foodX && snakeY == foodY) 
-    {
+    // Lógica da cobra do jogador
+    if (snakeX == foodX && snakeY == foodY) {
         snakeBody.push([foodX, foodY]);
         placeFood();
+        playerScore++;
+        updateScoreboard();
     }
 
-    for (let i = snakeBody.length - 1; i > 0; i--) 
-    {
+    // Atualiza o corpo da cobra do jogador
+    for (let i = snakeBody.length - 1; i > 0; i--) {
         snakeBody[i] = snakeBody[i - 1];
     }
-
-    if (snakeBody.length) 
-    {
+    if (snakeBody.length) {
         snakeBody[0] = [snakeX, snakeY];
     }
 
+    // Desenha a cobra do jogador
     context.fillStyle = "lime";
     snakeX += velocityX * blockSize;
     snakeY += velocityY * blockSize;
     context.fillRect(snakeX, snakeY, blockSize, blockSize);
-    for (let i = 0; i < snakeBody.length; i++) 
-    {
+    for (let i = 0; i < snakeBody.length; i++) {
         context.fillRect(snakeBody[i][0], snakeBody[i][1], blockSize, blockSize);
     }
 
-    // Movimentação da cobra do computador
-    moveComputerSnake();
+    // Lógica da cobra do computador (apenas no modo "vsComputer")
+    if (gameMode === "vsComputer") {
+        if (computerSnakeX == foodX && computerSnakeY == foodY) {
+            computerSnakeBody.push([foodX, foodY]);
+            placeFood();
+            computerScore++;
+            updateScoreboard();
+        }
 
-    if (computerSnakeX == foodX && computerSnakeY == foodY) 
-    {
-        computerSnakeBody.push([foodX, foodY]);
-        placeFood();
+        moveComputerSnake();
+
+        // Atualiza o corpo da cobra do computador
+        for (let i = computerSnakeBody.length - 1; i > 0; i--) {
+            computerSnakeBody[i] = computerSnakeBody[i - 1];
+        }
+        if (computerSnakeBody.length) {
+            computerSnakeBody[0] = [computerSnakeX, computerSnakeY];
+        }
+
+        // Desenha a cobra do computador
+        context.fillStyle = "blue";
+        computerSnakeX += computerVelocityX * blockSize;
+        computerSnakeY += computerVelocityY * blockSize;
+        context.fillRect(computerSnakeX, computerSnakeY, blockSize, blockSize);
+        for (let i = 0; i < computerSnakeBody.length; i++) {
+            context.fillRect(computerSnakeBody[i][0], computerSnakeBody[i][1], blockSize, blockSize);
+        }
     }
 
-    for (let i = computerSnakeBody.length - 1; i > 0; i--) 
-    {
-        computerSnakeBody[i] = computerSnakeBody[i - 1];
-    }
-
-    if (computerSnakeBody.length) 
-    {
-        computerSnakeBody[0] = [computerSnakeX, computerSnakeY];
-    }
-
-    context.fillStyle = "blue";
-    computerSnakeX += computerVelocityX * blockSize;
-    computerSnakeY += computerVelocityY * blockSize;
-    context.fillRect(computerSnakeX, computerSnakeY, blockSize, blockSize);
-    for (let i = 0; i < computerSnakeBody.length; i++) 
-    {
-        context.fillRect(computerSnakeBody[i][0], computerSnakeBody[i][1], blockSize, blockSize);
-    }
-
-    // Verificar colisões
+    // Verifica colisões
     checkCollisions();
 }
 
-function changeDirection(e)
-{
-    if (e.code == "ArrowUp" && velocityY != 1)
-        {
-            velocityX = 0;
-            velocityY = -1;
-        }
-    else if (e.code == "ArrowDown" && velocityY != -1)
-        {
-            velocityX = 0;
-            velocityY = 1;
-        }
-    else if (e.code == "ArrowRight" && velocityX != -1)
-        {
-            velocityX = 1;
-            velocityY = 0;
-        }
-    else if (e.code == "ArrowLeft" && velocityX != 1)
-        {
-            velocityX = -1;
-            velocityY = 0;
-        }
-
-       
+function changeDirection(e) {
+    if (e.code == "ArrowUp" && velocityY != 1) {
+        velocityX = 0;
+        velocityY = -1;
+    } else if (e.code == "ArrowDown" && velocityY != -1) {
+        velocityX = 0;
+        velocityY = 1;
+    } else if (e.code == "ArrowRight" && velocityX != -1) {
+        velocityX = 1;
+        velocityY = 0;
+    } else if (e.code == "ArrowLeft" && velocityX != 1) {
+        velocityX = -1;
+        velocityY = 0;
+    }
 }
 
 function checkCollisions() {
     // Colisões da cobra do jogador
-    if (snakeX < 0 || snakeX > cols * blockSize - 1 || snakeY < 0 || snakeY > rows * blockSize - 1) 
-    {
+    if (snakeX < 0 || snakeX > cols * blockSize - 1 || snakeY < 0 || snakeY > rows * blockSize - 1) {
         endGame("Você perdeu!");
     }
 
-    for (let i = 0; i < snakeBody.length; i++) 
-    {
-        if (snakeX == snakeBody[i][0] && snakeY == snakeBody[i][1])
-        {
+    for (let i = 0; i < snakeBody.length; i++) {
+        if (snakeX == snakeBody[i][0] && snakeY == snakeBody[i][1]) {
             endGame("Você perdeu!");
         }
     }
 
-    // Colisões da cobra do computador
-    if (computerSnakeX < 0 || computerSnakeX > cols * blockSize - 1 || computerSnakeY < 0 || computerSnakeY > rows * blockSize - 1) 
-    {
-        endGame("O computador perdeu!");
-    }
-
-    for (let i = 0; i < computerSnakeBody.length; i++) 
-    {
-        if (computerSnakeX == computerSnakeBody[i][0] && computerSnakeY == computerSnakeBody[i][1]) 
-        {
+    // Colisões da cobra do computador (apenas no modo "vsComputer")
+    if (gameMode === "vsComputer") {
+        if (computerSnakeX < 0 || computerSnakeX > cols * blockSize - 1 || computerSnakeY < 0 || computerSnakeY > rows * blockSize - 1) {
             endGame("O computador perdeu!");
         }
-    }
 
-    // Colisão entre as cobras
-    for (let i = 0; i < snakeBody.length; i++) 
-    {
-        if (computerSnakeX == snakeBody[i][0] && computerSnakeY == snakeBody[i][1]) 
-        {
-            endGame("O computador colidiu com você!");
+        for (let i = 0; i < computerSnakeBody.length; i++) {
+            if (computerSnakeX == computerSnakeBody[i][0] && computerSnakeY == computerSnakeBody[i][1]) {
+                endGame("O computador perdeu!");
+            }
         }
-    }
 
-    for (let i = 0; i < computerSnakeBody.length; i++) 
-    {
-        if (snakeX == computerSnakeBody[i][0] && snakeY == computerSnakeBody[i][1]) 
-        {
-            endGame("Você colidiu com o computador!");
+        // Colisão entre as cobras
+        for (let i = 0; i < snakeBody.length; i++) {
+            if (computerSnakeX == snakeBody[i][0] && computerSnakeY == snakeBody[i][1]) {
+                endGame("O computador colidiu com você!");
+            }
         }
-    }
 
-    if (snakeX == computerSnakeX && snakeY == computerSnakeY) 
-    {
-        endGame("Colisão direta entre as cobras!");
+        for (let i = 0; i < computerSnakeBody.length; i++) {
+            if (snakeX == computerSnakeBody[i][0] && snakeY == computerSnakeBody[i][1]) {
+                endGame("Você colidiu com o computador!");
+            }
+        }
+
+        if (snakeX == computerSnakeX && snakeY == computerSnakeY) {
+            endGame("Colisão direta entre as cobras!");
+        }
     }
 }
-function updateScoreboard() 
-{
+
+function updateScoreboard() {
     document.getElementById("playerScoreDisplay").textContent = playerScore;
 
-    document.getElementById("computerScoreDisplay").textContent = computerScore;
+    // Mostra ou oculta a pontuação do computador com base no modo de jogo
+    if (gameMode === "vsComputer") {
+        document.getElementById("computerScoreDisplay").textContent = computerScore;
+        document.getElementById("computerScoreDisplay").style.display = "inline";
+    } else {
+        document.getElementById("computerScoreDisplay").style.display = "none";
+    }
 }
 
-function endGame(message) 
-{
+function endGame(message) {
     gameOver = true;
     let resultMessage = `Fim de Jogo!\n${message}\n\n`;
     resultMessage += `Jogador: ${playerName}\n`;
     resultMessage += `Pontuação do Jogador: ${playerScore}\n`;
-    resultMessage += `Pontuação do Computador: ${computerScore}\n\n`;
+    if (gameMode === "vsComputer") {
+        resultMessage += `Pontuação do Computador: ${computerScore}\n\n`;
+    }
     resultMessage += `Deseja jogar novamente?`;
 
-    if (confirm(resultMessage)) 
-    {
+    if (confirm(resultMessage)) {
         restartGame();
     }
 }
 
-function moveComputerSnake() 
-{
-    if (computerSnakeX < foodX) 
-    {
+function moveComputerSnake() {
+    // Movimentação simples da cobra do computador em direção à comida
+    if (computerSnakeX < foodX) {
         computerVelocityX = 1;
         computerVelocityY = 0;
-    } else if (computerSnakeX > foodX) 
-    {
+    } else if (computerSnakeX > foodX) {
         computerVelocityX = -1;
         computerVelocityY = 0;
-    } else if (computerSnakeY < foodY) 
-    {
+    } else if (computerSnakeY < foodY) {
         computerVelocityX = 0;
         computerVelocityY = 1;
-    } else if (computerSnakeY > foodY) 
-    {
+    } else if (computerSnakeY > foodY) {
         computerVelocityX = 0;
         computerVelocityY = -1;
     }
 }
-//função que utiliza math.floor pra posicionar a comida em um lugar aleatório a cada update
-function placeFood()
-{
+
+// Função que utiliza Math.floor para posicionar a comida em um lugar aleatório a cada update
+function placeFood() {
     foodX = Math.floor(Math.random() * cols) * blockSize;
     foodY = Math.floor(Math.random() * rows) * blockSize;
 }
 
-function restartGame() 
-{
+function restartGame() {
     // Reinicia as variáveis do jogo
     snakeX = blockSize * 5;
     snakeY = blockSize * 5;
@@ -309,7 +260,8 @@ function restartGame()
 
     playerScore = 0;
     computerScore = 0;
-    
+
     gameOver = false;
     placeFood();
+    updateScoreboard();
 }

@@ -84,3 +84,13 @@ button:active {
 #scoreboard span.computer {
     color: #2196F3; /* Azul para a pontuação do computador */
 }
+
+#gameMode {
+    padding: 5px;
+    font-size: 16px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    background-color: #333;
+    color: white;
+    margin-left: 10px;
+}

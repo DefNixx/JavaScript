@@ -14,8 +14,17 @@
             <label for="playerName" id="playername">Seu Nome:</label>
             <input type="text" id="playerName" placeholder="Digite seu nome">
             <button onclick="startGame()">Iniciar Jogo</button>
+
         </div>
 
+        <div>
+            <label for="gameMode">Modo de Jogo:</label>
+            <select id="gameMode">
+                <option value="single">Jogar Sozinho</option>
+                <option value="vsComputer">Jogar Contra o Computador</option>
+            </select>
+        </div>
+        
         <div id="scoreboard">
             <p>Jogador: <span id="playerScoreDisplay">0</span></p>
             <p>Computador: <span id="computerScoreDisplay" class="computer">0</span></p>
