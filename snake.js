@@ -1,3 +1,10 @@
+window.addEventListener("keydown", function(e) 
+{
+    if (["ArrowUp", "ArrowDown"].includes(e.code)) {
+        e.preventDefault();
+    }
+});
+
 // Variáveis para o nome do jogador e pontuação
 var playerName = "";
 var playerScore = 0;
